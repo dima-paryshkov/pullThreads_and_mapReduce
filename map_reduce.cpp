@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <vector>
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -94,6 +95,25 @@ int main()
         threadCount = arrSize;
     for (int i = 0; i<arrSize; i++)
         arr.push_back(i);
+
+    auto begin = chrono::steady_clock::now();
+
     mapReduse(arr, map, reduce, threadCount);
-    cout << "Answer:" << redRes << endl;
+
+    auto end = chrono::steady_clock::now();
+    auto time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
+
+
+    cout << "Answer 1:\t" << redRes << endl;
+    cout << "Time 1:  \t" << time.count() << endl;
+
+    begin = chrono::steady_clock::now();
+    int sum = 0;
+    for (int i = 0; i<arrSize; i++)
+        sum += arr[i];
+    end = chrono::steady_clock::now();
+    time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
+
+    cout << "Time 2:  \t" << time.count() << endl;
+    cout << "Answer 2:\t" << sum << endl;
 }
