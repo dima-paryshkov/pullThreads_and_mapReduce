@@ -7,9 +7,18 @@
 
 using namespace std;
 
-#define err_exit(code, str) { cerr << str << ": " << std::strerror(code) << endl; exit(EXIT_FAILURE); }
+#define err_exit(code, str)                                 \
+    {                                                       \
+        cerr << str << ": " << std::strerror(code) << endl; \
+        exit(EXIT_FAILURE);                                 \
+    }
 
-enum SyncTypes { LACK /*no sync*/, MUTEX, SPINLOCK };  
+enum SyncTypes
+{
+    LACK /*no sync*/,
+    MUTEX,
+    SPINLOCK
+};
 SyncTypes SyncType = SyncTypes::LACK;
 
 const int TASKS_COUNT = 30;
@@ -24,7 +33,7 @@ void do_task()
     for (int i = 0; i < 1E+2; i++)
     {
         a += pow(2, i);
-    }  
+    }
 }
 
 void *thread_job(void *arg)
@@ -32,8 +41,8 @@ void *thread_job(void *arg)
     int task;
     int err;
     int *thread_n = (int *)arg;
-    
-    while(true) 
+
+    while (true)
     {
         switch (SyncType)
         {
@@ -63,7 +72,7 @@ void *thread_job(void *arg)
             err = pthread_spin_unlock(&spinlock);
             if (err != 0)
                 err_exit(err, "Cannot lock mutex");
-                break;
+            break;
         }
         if (task < TASKS_COUNT)
             do_task();
@@ -72,10 +81,10 @@ void *thread_job(void *arg)
     }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int err;
-    
+
     switch (SyncType)
     {
     case LACK:
@@ -92,35 +101,34 @@ int main(int argc, char* argv[])
         err = pthread_spin_init(&spinlock, PTHREAD_PROCESS_PRIVATE);
         if (err != 0)
             err_exit(err, "Cannot lock mutex");
-            break;
+        break;
     }
 
     int threads_count;
 
-    if (argc < 3) 
+    if (argc < 3)
     {
         cout << "Too few program arguments:" << endl;
         cout << "Need to specify the count of threads." << endl;
         exit(0);
     }
 
-    if (atoi(argv[1]) < 0 || atoi(argv[1]) > 3) 
+    if (atoi(argv[1]) < 0 || atoi(argv[1]) > 3)
     {
         cout << "Wrong mode of operation. 0 - no synchronization, 1 - mutex, 2 - spinlock." << endl;
         exit(0);
     }
-    else 
+    else
         SyncType = (SyncTypes)atoi(argv[1]);
- 
+
     threads_count = atoi(argv[2]);
-    if (threads_count <= 0) 
+    if (threads_count <= 0)
     {
         cout << "Count of threads must be > 0" << endl;
         exit(0);
     }
- 
- 
-    pthread_t* threads = new pthread_t[threads_count];
+
+    pthread_t *threads = new pthread_t[threads_count];
 
     err = pthread_mutex_init(&mutex, NULL);
     if (err != 0)
@@ -132,10 +140,10 @@ int main(int argc, char* argv[])
 
     auto begin = chrono::steady_clock::now();
 
-    for (int i = 0; i < threads_count; i++) 
+    for (int i = 0; i < threads_count; i++)
     {
         err = pthread_create(threads + i, NULL, &thread_job, NULL);
-        if (err != 0) 
+        if (err != 0)
         {
             char err_str[35];
             snprintf(err_str, strlen(err_str) * sizeof(char), "Cannot create thread %d", i);
@@ -143,13 +151,13 @@ int main(int argc, char* argv[])
         }
     }
 
-    for (int i = 0; i < threads_count; i++) 
+    for (int i = 0; i < threads_count; i++)
         pthread_join(threads[i], NULL);
 
     auto end = chrono::steady_clock::now();
 
     auto time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
-    //cout << "Program running time " << time.count() <<  endl;
+    // cout << "Program running time " << time.count() <<  endl;
     cout << time.count();
 
     pthread_mutex_destroy(&mutex);

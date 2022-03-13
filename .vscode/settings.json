@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "queue": "cpp",
+        "cmath": "cpp",
+        "chrono": "cpp",
+        "initializer_list": "cpp",
+        "ostream": "cpp"
+    }
+}

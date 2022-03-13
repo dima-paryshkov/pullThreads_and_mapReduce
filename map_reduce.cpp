@@ -75,9 +75,9 @@ int mapReduse(vector<int> arr, mapFunc map, int threadCount)
 int main()
 {
     vector<int> arr;
-    int threadCount, arrSize;
-    std::cout << "Enter arrey size\n";
-    cin >> arrSize;
+    int threadCount, arrSize = 1E+6;
+    // std::cout << "Enter array size\n";
+    // cin >> arrSize;
     cout << "Enter quantity of threads\n";
     cin >> threadCount;
     if (threadCount > arrSize)

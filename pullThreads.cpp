@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
 
     getBasePrimeNumbers(n);
 
-    int threadsCount = 4;
+    int threadsCount = 2;
     ThreadPool threadPool(&checkNumber, threadsCount);
 
     auto begin = chrono::steady_clock::now();
