@@ -8,8 +8,7 @@
 using namespace std;
 
 int redRes = 0;
-typedef void *(mapFunc)(void*);
-typedef void *(reduceFunc)(void*);
+typedef void *(mapFunc)(void *);
 
 struct mapData
 {
@@ -19,7 +18,7 @@ struct mapData
 
 void *map(void *arg)
 {
-    mapData *data = (mapData*) arg;
+    mapData *data = (mapData *)arg;
     vector<int> arr = (*data).array;
     int res = 0;
     for (int i = 0; i < arr.size(); i++)
@@ -27,14 +26,13 @@ void *map(void *arg)
     (*data).result = res;
 }
 
-void *reduce(void *arg)
+void reduce(mapData *data, int countThreads)
 {
-    mapData *data = (mapData*) arg;
-    int mapRes = (*data).result;
-    redRes += mapRes;
+    for (int i = 0; i < countThreads; i++)
+        redRes += data[i].result;
 }
 
-int mapReduse(vector<int> arr, mapFunc map, reduceFunc reduce, int threadCount)
+int mapReduse(vector<int> arr, mapFunc map, int threadCount)
 {
     pthread_t *threads;
     threads = new pthread_t[threadCount];
@@ -43,12 +41,11 @@ int mapReduse(vector<int> arr, mapFunc map, reduceFunc reduce, int threadCount)
     int pointer = 0;
     for (int i = 0; i < threadCount; i++)
     {
-        do 
+        do
         {
             data[i].array.push_back(arr[pointer]);
             pointer++;
-        }
-        while (pointer % (arr.size() / threadCount) != 0 );
+        } while (pointer % (arr.size() / threadCount) != 0);
     }
 
     if (pointer < arr.size())
@@ -62,7 +59,7 @@ int mapReduse(vector<int> arr, mapFunc map, reduceFunc reduce, int threadCount)
     for (int i = 0; i < threadCount; i++)
     {
         err = pthread_create(&threads[i], NULL, map, &data[i]);
-        if(err != 0)
+        if (err != 0)
             cout << "Cannot create thread " << i << endl;
     }
     for (int i = 0; i < threadCount; i++)
@@ -71,16 +68,8 @@ int mapReduse(vector<int> arr, mapFunc map, reduceFunc reduce, int threadCount)
     vector<int> mapRes;
     for (int i = 0; i < threadCount; i++)
         mapRes.push_back(data[i].result);
-    
-    for (int i = 0; i < threadCount; i++)
-    {
-        err = pthread_create(&threads[i], NULL, reduce, &data[i]);
-        if(err != 0)
-            cout << "Cannot create thread " << i << endl;
-    }
-    for (int i = 0; i < threadCount; i++)
-        pthread_join(threads[i], NULL);
 
+    reduce(data, threadCount);
 }
 
 int main()
@@ -93,27 +82,26 @@ int main()
     cin >> threadCount;
     if (threadCount > arrSize)
         threadCount = arrSize;
-    for (int i = 0; i<arrSize; i++)
+    for (int i = 0; i < arrSize; i++)
         arr.push_back(i);
 
     auto begin = chrono::steady_clock::now();
 
-    mapReduse(arr, map, reduce, threadCount);
+    mapReduse(arr, map, threadCount);
 
     auto end = chrono::steady_clock::now();
     auto time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
-
-    cout << "Answer 1:\t" << redRes << endl;
+    // cout << "Answer 1:\t" << redRes << endl;
     cout << "Time 1:  \t" << time.count() << endl;
 
-    begin = chrono::steady_clock::now();
-    int sum = 0;
-    for (int i = 0; i<arrSize; i++)
-        sum += arr[i];
-    end = chrono::steady_clock::now();
-    time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    // begin = chrono::steady_clock::now();
+    // int sum = 0;
+    // for (int i = 0; i < arrSize; i++)
+    //     sum += arr[i];
+    // end = chrono::steady_clock::now();
+    // time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
-    cout << "Time 2:  \t" << time.count() << endl;
-    cout << "Answer 2:\t" << sum << endl;
+    // cout << "Time 2:  \t" << time.count() << endl;
+    // cout << "Answer 2:\t" << sum << endl;
 }
