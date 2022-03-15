@@ -76,8 +76,8 @@ int main()
 {
     vector<int> arr;
     int threadCount, arrSize = 1E+6;
-    // std::cout << "Enter array size\n";
-    // cin >> arrSize;
+    std::cout << "Enter array size\n";
+    cin >> arrSize;
     cout << "Enter quantity of threads\n";
     cin >> threadCount;
     if (threadCount > arrSize)
@@ -92,16 +92,16 @@ int main()
     auto end = chrono::steady_clock::now();
     auto time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
-    // cout << "Answer 1:\t" << redRes << endl;
+    cout << "Answer 1:\t" << redRes << endl;
     cout << "Time 1:  \t" << time.count() << endl;
 
-    // begin = chrono::steady_clock::now();
-    // int sum = 0;
-    // for (int i = 0; i < arrSize; i++)
-    //     sum += arr[i];
-    // end = chrono::steady_clock::now();
-    // time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    begin = chrono::steady_clock::now();
+    int sum = 0;
+    for (int i = 0; i < arrSize; i++)
+        sum += arr[i];
+    end = chrono::steady_clock::now();
+    time = chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
-    // cout << "Time 2:  \t" << time.count() << endl;
-    // cout << "Answer 2:\t" << sum << endl;
+    cout << "Time 2:  \t" << time.count() << endl;
+    cout << "Answer 2:\t" << sum << endl;
 }
